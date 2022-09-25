@@ -20,7 +20,12 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({
+    name: 'email',
+    type: 'varchar',
+    nullable: false,
+    unique: true,
+  })
   email: string;
 
   @OneToMany((type) => UserAuthority, (userAuthority) => userAuthority.user, {

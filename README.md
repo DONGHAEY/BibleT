@@ -1,6 +1,11 @@
 서버 - Nest.js
 
-1. Auth Module -> User Entity에 Email Column Unique 설정하기
+2022.08.01 시작
+2022.10.20 까지
+
+더 해야할것들
+
+1. Auth Module -> User Entity에 Email Column Unique 설정하기 (완료 with Exsist User checking)
 2. 비밀번호 찾기 기능
 3. 카카오 로그인 기능
 4. Auth Module -> Auth Controller에서 User정보를 검색하는 API추가

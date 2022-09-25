@@ -20,11 +20,18 @@ export class AuthService {
   ) {}
 
   async registerUser(newUser: RegisterUserDto) {
-    let userFind: User = await this.userService.findByFields({
-      where: { username: newUser.username },
-    });
+    let userFind: User =
+      (await this.userService.findByFields({
+        where: { username: newUser.username },
+      })) ||
+      (await this.userService.findByFields({
+        where: { email: newUser.email },
+      }));
     if (userFind) {
-      throw new HttpException('UserName Aleady Used!', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        '아이디 또는 이메일이 이미 사용중입니다!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
     try {
       await this.userService.save(newUser);
