@@ -14,7 +14,7 @@ import { CheckStamp } from './check-stamp.entity';
 import { Train } from './train.entitiy';
 
 @Entity('bible_track')
-export class BibleTrack {
+export class BibleTrack extends BaseEntity {
   @PrimaryColumn({
     name: 'train_id',
     type: 'int',
