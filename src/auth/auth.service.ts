@@ -11,12 +11,14 @@ import { Payload } from './security/payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/domain/user.entity';
 import { RegisterUserDto } from './dto/registerUser.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private mailService: MailService,
   ) {}
 
   async registerUser(newUser: RegisterUserDto) {
@@ -34,7 +36,8 @@ export class AuthService {
       );
     }
     try {
-      await this.userService.createUser(newUser);
+      const nUser: User = await this.userService.createUser(newUser);
+      await this.mailService.sendUserConfirmation(nUser, 'abcdefg');
       return {
         success: true,
       };

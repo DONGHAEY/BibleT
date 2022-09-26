@@ -12,6 +12,7 @@ import { Bible } from './domain/bible.entity';
 import { TrackModule } from './track/track.module';
 import { BibleTrack } from './domain/bible-track.entity';
 import { CheckStamp } from './domain/check-stamp.entity';
+import { MailModule } from './mail/mail.module';
 
 
 
@@ -32,6 +33,7 @@ import { CheckStamp } from './domain/check-stamp.entity';
     AuthModule,
     TrainModule,
     TrackModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

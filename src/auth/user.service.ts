@@ -17,14 +17,14 @@ export class UserService {
     return await this.userRepository.findOne(options);
   }
 
-  async createUser(userDto: RegisterUserDto): Promise<void> {
+  async createUser(userDto: RegisterUserDto): Promise<User | undefined> {
     await this.transformPassword(userDto);
     const nUser = new User();
     nUser.email = userDto.email;
     nUser.username = userDto.username;
     nUser.password = userDto.password;
     nUser.save();
-    return;
+    return nUser;
   }
 
   async transformPassword(user: RegisterUserDto): Promise<void> {
