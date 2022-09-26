@@ -34,7 +34,7 @@ export class AuthService {
       );
     }
     try {
-      await this.userService.save(newUser);
+      await this.userService.createUser(newUser);
       return {
         success: true,
       };

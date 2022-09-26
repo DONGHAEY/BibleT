@@ -13,3 +13,5 @@
 6. 서비스 자체 탈퇴기능
 7. CheckStamps Entity에 인상깊은 구절 컬럼 추가하기
 8. 소켓으로 친구요청 알람, 기차 초대 알람, 트랙 등록 알람 기능 완료하기
+
+https://seungtaek-overflow.tistory.com/15
