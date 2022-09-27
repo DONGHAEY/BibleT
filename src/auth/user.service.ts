@@ -28,7 +28,7 @@ export class UserService {
     return nUser;
   }
 
-  async transformPassword(user: RegisterUserDto): Promise<void> {
+  async transformPassword(user): Promise<void> {
     user.password = await bcrypt.hash(user.password, 10);
     return Promise.resolve();
   }

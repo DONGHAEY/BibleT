@@ -24,10 +24,14 @@ import { RegisterUserDto } from './dto/registerUser.dto';
 import { randomBytes } from 'crypto';
 import { GetUser } from './decorator/userinfo.decorator';
 import { User } from 'src/domain/user.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Controller('/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private mailService: MailService,
+  ) {}
 
   @Post('/register')
   @UsePipes(ValidationPipe)
@@ -88,6 +92,7 @@ export class AuthController {
   async resetPassword(@GetUser() user: User) {
     const resetedPassword = randomBytes(4).toString('hex');
     await this.authService.modifyPassword(user.username, resetedPassword);
+    await this.mailService.sendModifiedPassword(user, resetedPassword);
   }
 
   @Put('/modifyPassword')
@@ -101,8 +106,8 @@ export class AuthController {
       username: user.username,
       password: password,
     };
-    await this.authService.validateUser(userDto);
-    this.authService.modifyPassword(user.username, newPassword);
+    const jwt = await this.authService.validateUser(userDto);
+    await this.authService.modifyPassword(jwt.user.username, newPassword);
   }
 
   // @Delete('/secession')

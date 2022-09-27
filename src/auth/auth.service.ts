@@ -19,16 +19,15 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-    private mailService: MailService,
   ) {}
 
   async modifyPassword(username: string, resetedPassword: string) {
     let userFind: User = await this.userService.findByFields({
       where: { username },
     });
-    resetedPassword = randomBytes(4).toString('hex');
     userFind.password = resetedPassword;
     await this.userService.transformPassword(userFind);
+    await userFind.save();
   }
 
   async registerUser(newUser: RegisterUserDto) {
@@ -47,7 +46,6 @@ export class AuthService {
     }
     try {
       const nUser: User = await this.userService.createUser(newUser);
-      await this.mailService.sendUserConfirmation(nUser, 'abcdefg');
       return {
         success: true,
       };
