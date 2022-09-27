@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/domain/user.entity';
 import { RegisterUserDto } from './dto/registerUser.dto';
 import { MailService } from 'src/mail/mail.service';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,15 @@ export class AuthService {
     private jwtService: JwtService,
     private mailService: MailService,
   ) {}
+
+  async modifyPassword(username: string, resetedPassword: string) {
+    let userFind: User = await this.userService.findByFields({
+      where: { username },
+    });
+    resetedPassword = randomBytes(4).toString('hex');
+    userFind.password = resetedPassword;
+    await this.userService.transformPassword(userFind);
+  }
 
   async registerUser(newUser: RegisterUserDto) {
     let userFind: User =

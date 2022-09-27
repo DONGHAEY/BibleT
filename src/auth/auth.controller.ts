@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -20,6 +21,9 @@ import { Roles } from './decorator/role.decorator';
 import { RoleType } from './role-type';
 import { UserService } from './user.service';
 import { RegisterUserDto } from './dto/registerUser.dto';
+import { randomBytes } from 'crypto';
+import { GetUser } from './decorator/userinfo.decorator';
+import { User } from 'src/domain/user.entity';
 
 @Controller('/auth')
 export class AuthController {
@@ -77,6 +81,28 @@ export class AuthController {
   adminRoleCheck(@Req() req: Request): any {
     const user: any = req.user;
     return user;
+  }
+
+  @Put('/resetPassword')
+  @UseGuards(AuthGuard)
+  async resetPassword(@GetUser() user: User) {
+    const resetedPassword = randomBytes(4).toString('hex');
+    await this.authService.modifyPassword(user.username, resetedPassword);
+  }
+
+  @Put('/modifyPassword')
+  @UseGuards(AuthGuard)
+  async modifyPassword(
+    @GetUser() user: User,
+    @Body('password') password: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    const userDto: UserDto = {
+      username: user.username,
+      password: password,
+    };
+    await this.authService.validateUser(userDto);
+    this.authService.modifyPassword(user.username, newPassword);
   }
 
   // @Delete('/secession')

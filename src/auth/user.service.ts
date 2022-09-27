@@ -6,6 +6,7 @@ import { UserRepository } from './repository/user.repository';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/domain/user.entity';
 import { RegisterUserDto } from './dto/registerUser.dto';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class UserService {
