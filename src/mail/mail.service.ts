@@ -7,14 +7,14 @@ import { RegisterUserDto } from 'src/auth/dto/registerUser.dto';
 export class MailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendModifiedPassword(user: RegisterUserDto, modifyedPassword: string) {
+  async sendForResetPassword(user: RegisterUserDto, token: string) {
     await this.mailerService.sendMail({
       to: user.email,
-      subject: '변경된 비밀번호를 알려드립니다',
+      subject: 'BibleT 비밀번호를 변경하시려면 이 인증메일을 확인하세요',
       template: './confirmation',
       context: {
         username: user.username,
-        newPassword: modifyedPassword,
+        token: 'http://localhost:3000/resetPassword?resetToken=' + token,
       },
     });
   }

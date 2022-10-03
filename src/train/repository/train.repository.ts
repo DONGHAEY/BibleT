@@ -43,7 +43,6 @@ export class TrainRepository extends Repository<Train> {
   }
 
   async checkTrainJoinKey(trainId: number, jokey: string): Promise<boolean> {
-    console.log(jokey);
     const trainInfo: Train = await this.getTrainById(trainId);
     console.log(trainInfo, jokey);
     if (trainInfo.joinKey !== jokey) {

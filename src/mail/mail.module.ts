@@ -13,7 +13,7 @@ import { join } from 'path';
           secure: true,
           auth: {
             user: 'namjangsu12@gmail.com',
-            pass: 'qjukdlbkzlaffcnf',
+            pass: 'chbwcidxnadqwhpu',
           },
         },
         defaults: {

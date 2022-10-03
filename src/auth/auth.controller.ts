@@ -1,10 +1,10 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Post,
   Put,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -44,12 +44,11 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() userDto: UserDto, @Res() res: Response): Promise<any> {
-    // console.log(userDto);
     const jwt = await this.authService.validateUser(userDto);
-    res.setHeader('Authorization', 'Bearer ' + jwt.accessToken);
+    // res.setHeader('Authorization', 'Bearer ' + jwt.accessToken);
     res.cookie('jwt', jwt.accessToken, {
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, //1 day
+      maxAge: 24 * 60 * 60 * 100,
     });
     return res.json({
       success: true,
@@ -60,7 +59,7 @@ export class AuthController {
 
   @Post('/logout')
   logout(@Req() req: Request, @Res() res: Response): any {
-    res.setHeader('Authorization', 'Bearer ');
+    // res.setHeader('Authorization', 'Bearer ');
     res.cookie('jwt', '', {
       maxAge: 0,
     });
@@ -87,12 +86,15 @@ export class AuthController {
     return user;
   }
 
-  @Put('/resetPassword')
-  @UseGuards(AuthGuard)
-  async resetPassword(@GetUser() user: User) {
-    const resetedPassword = randomBytes(4).toString('hex');
-    await this.authService.modifyPassword(user.username, resetedPassword);
-    await this.mailService.sendModifiedPassword(user, resetedPassword);
+  @Post('/sendResetPasswordMail')
+  async sendResetPasswordMail(@Body('username') username: string) {
+    const jwt = await this.authService.resetPasswordToken(username);
+    await this.mailService.sendForResetPassword(jwt.user, jwt.token);
+  }
+
+  @Get('/ResetPassword')
+  async resetPassword(@Query('token') token: string) {
+    this.authService.resetPassword(token);
   }
 
   @Put('/modifyPassword')

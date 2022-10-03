@@ -14,10 +14,7 @@ import { MailModule } from 'src/mail/mail.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([UserRepository, UserAuthorityRepository]),
-    JwtModule.register({
-      secret: 'SECRET_KEY',
-      signOptions: { expiresIn: '1000s' },
-    }),
+    JwtModule,
     PassportModule,
     MailModule,
   ],

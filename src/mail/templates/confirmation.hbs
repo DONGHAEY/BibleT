@@ -1,7 +1,9 @@
-<div style='background-color:wheat'>
+<div
+  style='background-color:wheat; display:flex; flex-direction:column; align-items:center; justify-content:center;'
+>
   <h1>안녕하세요 {{username}}님,</h1>
   <h3>BibleT서비스를 이용해주셔서 감사합니다!</h3>
-  <h3>비밀번호를 재설정 하셨습니다</h3>
-  <p>이곳 아래에 초기화된 비밀번호를 두었습니다</p>
-  <p>{{newPassword}}</p>
+  <h3>비밀번호를 재설정을 하시려는군요!</h3>
+  <p>비밀번호를 재설정 하기 위해 아래의 링크를 눌러주세요</p>
+  <a href='{{token}}'>비밀번호 재설정</a>
 </div>
