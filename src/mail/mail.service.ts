@@ -14,7 +14,19 @@ export class MailService {
       template: './confirmation',
       context: {
         username: user.username,
-        token: 'http://localhost:3000/resetPassword?resetToken=' + token,
+        token: 'http://localhost:8000/api/auth/resetPassword?token=' + token,
+      },
+    });
+  }
+
+  async sendForResetedPassword(user: User, resetedPassword: string) {
+    await this.mailerService.sendMail({
+      to: user.email,
+      subject: `${user.username}님, BibleT에서 변경된 비밀번호를 확인하세요`,
+      template: './resetedPassword',
+      context: {
+        username: user.username,
+        resetedPassword,
       },
     });
   }

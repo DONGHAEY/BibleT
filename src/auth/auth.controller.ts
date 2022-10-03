@@ -92,9 +92,14 @@ export class AuthController {
     await this.mailService.sendForResetPassword(jwt.user, jwt.token);
   }
 
-  @Get('/ResetPassword')
+  @Get('/resetPassword')
   async resetPassword(@Query('token') token: string) {
-    this.authService.resetPassword(token);
+    const resetPassword = randomBytes(4).toString('hex');
+    const modifiedUser = await this.authService.resetPassword(
+      token,
+      resetPassword,
+    );
+    await this.mailService.sendForResetedPassword(modifiedUser, resetPassword);
   }
 
   @Put('/modifyPassword')

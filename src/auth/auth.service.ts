@@ -40,19 +40,20 @@ export class AuthService {
         },
         {
           secret: 'SECRET_KEY2',
-          expiresIn: '60s',
+          expiresIn: '300s',
         },
       ),
       user: userInfo,
     };
   }
 
-  async resetPassword(token: string) {
+  async resetPassword(token: string, resetetPassword: string) {
     try {
       const decoded = this.jwtService.verify(token, {
         secret: 'SECRET_KEY2',
       });
-      console.log(decoded);
+
+      return await this.modifyPassword(decoded.username, resetetPassword);
     } catch (e) {
       if (e.message === 'jwt expired') {
         throw new UnauthorizedException('토큰이 만료되었습니다');
