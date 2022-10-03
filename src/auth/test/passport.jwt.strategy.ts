@@ -18,14 +18,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload, done: VerifiedCallback): Promise<any> {
-    const user = await this.authService.tokenValidateUser(payload);
-    if (!user) {
-      return done(
-        new UnauthorizedException({ message: '잘못된 유저 인증입니다' }),
-        false,
-      );
-    }
-    return done(null, user);
+    console.log('test');
+    return done(null, 1);
   }
 }
 
