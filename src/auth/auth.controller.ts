@@ -112,11 +112,12 @@ export class AuthController {
   }
 
   @Put('/modifyPassword')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard) //로그인이 되어있는 상태에서만 비밀번호를 변경 할 수 있다.
   async modifyPassword(
     @GetUser() user: User,
     @Body('password') password: string,
     @Body('newPassword') newPassword: string,
+    @Res() res: Response,
   ) {
     const userDto: UserDto = {
       username: user.username,
@@ -124,6 +125,10 @@ export class AuthController {
     };
     const jwt = await this.authService.validateUser(userDto);
     await this.authService.modifyPassword(jwt.user.username, newPassword);
+    res.cookie('accessToken', '', {
+      //다시 로그인을 하도록 유도
+      maxAge: 0,
+    });
   }
 
   // @Delete('/secession')
