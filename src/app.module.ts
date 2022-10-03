@@ -14,8 +14,6 @@ import { BibleTrack } from './domain/bible-track.entity';
 import { CheckStamp } from './domain/check-stamp.entity';
 import { MailModule } from './mail/mail.module';
 
-
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -26,8 +24,16 @@ import { MailModule } from './mail/mail.module';
       password: '9310',
       database: 'bibleTrain2',
       synchronize: false,
-      entities: [UserAuthority,User, Train, TrainProfile, Bible, BibleTrack, CheckStamp],
-      logging:true,
+      entities: [
+        UserAuthority,
+        User,
+        Train,
+        TrainProfile,
+        Bible,
+        BibleTrack,
+        CheckStamp,
+      ],
+      logging: true,
     }),
     // RouterModule.forRoutes(routes),
     AuthModule,
@@ -49,7 +55,4 @@ import { MailModule } from './mail/mail.module';
 //   controllers: [AppController],
 //   providers: [AppService],
 // })
-
-
-
 export class AppModule {}

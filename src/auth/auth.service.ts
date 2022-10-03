@@ -122,11 +122,10 @@ export class AuthService {
       username: userFind.username,
       authorities: userFind.authorities,
     };
-
     return {
       accessToken: this.jwtService.sign(payload, {
-        secret: 'SECRET_KEY',
-        expiresIn: '9000s',
+        secret: 'ACCESSTOKEN_SECRET_KEY',
+        expiresIn: '1h',
       }),
       user: userFind,
     };

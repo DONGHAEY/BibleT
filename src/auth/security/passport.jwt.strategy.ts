@@ -11,10 +11,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) => request.cookies.jwt,
+        (request: Request) => request.cookies.accessToken,
       ]),
       ignoreExpiration: false, //만료기한을 무시할것인가
-      secretOrKey: 'SECRET_KEY',
+      secretOrKey: 'ACCESSTOKEN_SECRET_KEY',
     });
   }
 
