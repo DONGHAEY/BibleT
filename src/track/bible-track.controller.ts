@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 import { query } from 'express';
 import { GetUser } from 'src/auth/decorator/userinfo.decorator';
-import { AuthGuard } from 'src/auth/security/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { TrainRoles } from 'src/train/decorator/train-role.decorator';
 import { TrainRolesGuard } from 'src/train/guard/train-roles.guard';
 import { RoleFormat } from 'src/domain/train-profile.entity';

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOneOptions } from 'typeorm';
 import { UserDto } from './dto/user.dto';
@@ -33,13 +33,56 @@ export class UserService {
     return Promise.resolve();
   }
 
-  // async deleteUser(userId : number) {
-  //     const {myProfiles} = await this.userRepository.findOne(userId, {relations : ['myProfiles']});
-  //     myProfiles.forEach(async (myProfile) => {
-  //         this.trainService.deleteTrainProfile(userId, myProfile.trainId);
-  //     })
-  //     await this.userRepository.delete({
-  //         id:userId
-  //     });
-  // }
+  async verifyPassword(plainTextPassword: string, hashedPassword: string) {
+    const isPasswordMatch = await bcrypt.compare(
+      plainTextPassword,
+      hashedPassword,
+    );
+    if (!isPasswordMatch) {
+      throw new UnauthorizedException('비밀번호가 올바르지않습니다');
+    }
+  }
+
+  async setCurrentRefreshToken(id: number, refreshToken: string) {
+    const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.update(id, { currentHashedRefreshToken });
+  }
+
+  async getUserById(userId: number) {
+    const user = await this.userRepository.findOne({
+      id: userId,
+    });
+    if (!user) {
+      throw new UnauthorizedException('존재하지 않는 유저입니다');
+    }
+    return user;
+  }
+
+  async getUserIfRefreshTokenMatches(id: number, refreshToken: string) {
+    const user = await this.getUserById(id);
+    const isRefreshTokenMatching = await bcrypt.compare(
+      refreshToken,
+      user.currentHashedRefreshToken,
+    );
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+    return null;
+  }
+
+  async removeRefreshToken(id: number) {
+    return this.userRepository.update(id, {
+      currentHashedRefreshToken: null,
+    });
+  }
 }
+
+// async deleteUser(userId : number) {
+//     const {myProfiles} = await this.userRepository.findOne(userId, {relations : ['myProfiles']});
+//     myProfiles.forEach(async (myProfile) => {
+//         this.trainService.deleteTrainProfile(userId, myProfile.trainId);
+//     })
+//     await this.userRepository.delete({
+//         id:userId
+//     });
+// }

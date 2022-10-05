@@ -6,10 +6,11 @@ import { AuthService } from './auth.service';
 import { UserRepository } from './repository/user.repository';
 import { UserService } from './user.service';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './security/passport.jwt.strategy';
+import { JwtStrategy } from './strategies/passport.jwt.strategy';
 import { UserAuthorityRepository } from './repository/user-authority.repository';
-import { AuthGuard } from './security/auth.guard';
+import { AuthGuard } from './guards/auth.guard';
 import { MailModule } from 'src/mail/mail.module';
+import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { MailModule } from 'src/mail/mail.module';
   ],
   exports: [TypeOrmModule],
   controllers: [AuthController],
-  providers: [AuthService, UserService, JwtStrategy],
+  providers: [AuthService, UserService, JwtStrategy, JwtRefreshStrategy],
 })
 export class AuthModule {}

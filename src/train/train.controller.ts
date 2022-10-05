@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { GetUser } from 'src/auth/decorator/userinfo.decorator';
-import { AuthGuard } from 'src/auth/security/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { User } from 'src/domain/user.entity';
 import { TrainService } from './train.service';
 import { MakeTrainDto } from './dto/MakeTrain.dto';

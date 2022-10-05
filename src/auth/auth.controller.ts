@@ -16,8 +16,8 @@ import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { Request } from 'express';
 import { UserDto } from './dto/user.dto';
-import { AuthGuard } from './security/auth.guard';
-import { RolesGuard } from './security/roles.guard';
+import { AuthGuard } from './guards/auth.guard';
+import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorator/role.decorator';
 import { RoleType } from './role-type';
 import { UserService } from './user.service';
@@ -26,11 +26,13 @@ import { randomBytes } from 'crypto';
 import { GetUser } from './decorator/userinfo.decorator';
 import { User } from 'src/domain/user.entity';
 import { MailService } from 'src/mail/mail.service';
+import { JwtRefreshGuard } from './guards/jwt-refresh.guard';
 
 @Controller('/auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private mailService: MailService,
   ) {}
 
@@ -45,22 +47,41 @@ export class AuthController {
 
   @Post('/login')
   async login(@Body() userDto: UserDto, @Res() res: Response): Promise<any> {
-    const jwt = await this.authService.validateUser(userDto);
+    const validatedUser = await this.authService.validateUser(userDto);
     // res.setHeader('Authorization', 'Bearer ' + jwt.accessToken);
-    res.cookie('accessToken', jwt.accessToken, {
+    const accessToken: string = await this.authService.getAccessToken(
+      validatedUser,
+    );
+
+    const refereshToken: string = await this.authService.getRefreshToken(
+      validatedUser,
+    );
+
+    await this.userService.setCurrentRefreshToken(
+      validatedUser.id,
+      refereshToken,
+    );
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
     });
+    res.cookie('refreshToken', refereshToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 1440,
+    });
     return res.json({
       success: true,
-      token: jwt.accessToken,
-      user: jwt.user,
+      refereshToken,
+      accessToken,
     });
   }
 
   @Post('/logout')
+  @UseGuards(JwtRefreshGuard)
   logout(@Req() req: Request, @Res() res: Response): any {
     // res.setHeader('Authorization', 'Bearer ');
+    const user: any = req.user;
+    this.userService.removeRefreshToken(user.id);
     res.cookie('accessToken', '', {
       maxAge: 0,
     });
@@ -79,6 +100,20 @@ export class AuthController {
     };
   }
 
+  @Post('/refresh')
+  @UseGuards(JwtRefreshGuard)
+  async giveNewToken(@Req() req: Request, @Res() res: Response) {
+    const user: any = req.user;
+    const accessToken: string = await this.authService.getAccessToken(user);
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60,
+    });
+    return res.send({
+      accessToken,
+    });
+  }
+
   @Get('/admin-role')
   @UseGuards(AuthGuard, RolesGuard)
   @Roles(RoleType.ADMIN, RoleType.USER)
@@ -95,7 +130,7 @@ export class AuthController {
 
   @Get('/resetPassword')
   @Render('resetedStatus.ejs')
-  async resetPassword(@Query('token') token: string) {
+  async resetPassword(@Query('token') token: string, @Res() res: Response) {
     const resetPassword = randomBytes(4).toString('hex');
     const modifiedUser = await this.authService.resetPassword(
       token,
@@ -105,6 +140,13 @@ export class AuthController {
       return { username: '', status: false };
     }
     await this.mailService.sendForResetedPassword(modifiedUser, resetPassword);
+    res.cookie('accessToken', '', {
+      maxAge: 0,
+    });
+    res.cookie('refreshToken', '', {
+      maxAge: 0,
+    });
+
     return {
       username: modifiedUser.username,
       status: true,
@@ -123,10 +165,12 @@ export class AuthController {
       username: user.username,
       password: password,
     };
-    const jwt = await this.authService.validateUser(userDto);
-    await this.authService.modifyPassword(jwt.user.username, newPassword);
+    const validatedUser = await this.authService.validateUser(userDto);
+    await this.authService.modifyPassword(validatedUser.username, newPassword);
     res.cookie('accessToken', '', {
-      //다시 로그인을 하도록 유도
+      maxAge: 0,
+    });
+    res.cookie('refreshToken', '', {
       maxAge: 0,
     });
   }

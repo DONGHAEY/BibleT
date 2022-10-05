@@ -22,7 +22,7 @@ import { MailModule } from './mail/mail.module';
       port: 3306,
       username: 'root',
       password: '9310',
-      database: 'bibleTrain2',
+      database: 'bibleTrainTest',
       synchronize: false,
       entities: [
         UserAuthority,

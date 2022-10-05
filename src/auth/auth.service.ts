@@ -8,7 +8,7 @@ import {
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
-import { Payload } from './security/payload.interface';
+import { Payload } from './types/payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/domain/user.entity';
 import { RegisterUserDto } from './dto/registerUser.dto';
@@ -52,7 +52,7 @@ export class AuthService {
       const decoded = this.jwtService.verify(token, {
         secret: 'SECRET_KEY2',
       });
-
+      await this.userService.removeRefreshToken(decoded.id);
       return await this.modifyPassword(decoded.username, resetetPassword);
     } catch (e) {
       if (e.message === 'jwt expired') {
@@ -99,44 +99,48 @@ export class AuthService {
       };
     }
   }
-
-  async validateUser(userDto: UserDto): Promise<any | undefined> {
+  async validateUser(userDto: UserDto): Promise<any> {
     let userFind: User = await this.userService.findByFields({
       where: { username: userDto.username },
     });
     if (!userFind) {
       throw new UnauthorizedException('아이디가 잘못되었습니다');
     }
-    const validatedPassword = await bcrypt.compare(
-      userDto.password,
-      userFind.password,
-    );
-    if (!userFind || !validatedPassword) {
-      throw new UnauthorizedException('비밀번호가 올바르지않습니다');
-    }
+    await this.userService.verifyPassword(userDto.password, userFind.password);
 
-    this.convertInAuthorities(userFind);
+    return userFind;
 
-    const payload: Payload = {
-      id: userFind.id,
-      username: userFind.username,
-      authorities: userFind.authorities,
-    };
-    return {
-      accessToken: this.jwtService.sign(payload, {
-        secret: 'ACCESSTOKEN_SECRET_KEY',
-        expiresIn: '1h',
-      }),
-      user: userFind,
-    };
+    // return {
+    //   accessToken: await this.getAccessToken(payload),
+    //   refereshToken: await this.getRefreshToken(payload),
+    //   user: userFind,
+    // };
   }
 
-  async tokenValidateUser(payload: Payload): Promise<UserDto | undefined> {
-    const userFind = await this.userService.findByFields({
-      where: { id: payload.id },
+  async getAccessToken(user: User) {
+    this.flatAuthorities(user);
+    const payload: Payload = {
+      id: user.id,
+      username: user.username,
+      authorities: user.authorities,
+    };
+    return this.jwtService.sign(payload, {
+      secret: 'ACCESSTOKEN_SECRET_KEY',
+      expiresIn: '1h',
     });
-    this.flatAuthorities(userFind);
-    return userFind;
+  }
+
+  async getRefreshToken(user: User) {
+    this.flatAuthorities(user);
+    const payload: Payload = {
+      id: user.id,
+      username: user.username,
+      authorities: user.authorities,
+    };
+    return this.jwtService.sign(payload, {
+      secret: 'REFERESHTOKEN_SECRET_KEY',
+      expiresIn: '60d',
+    });
   }
 
   private flatAuthorities(user: any): User {

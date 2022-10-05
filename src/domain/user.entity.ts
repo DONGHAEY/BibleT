@@ -38,4 +38,7 @@ export class User extends BaseEntity {
     cascade: true,
   })
   myProfiles?: any[];
+
+  @Column({ nullable: true, name: 'current-hashed-refresh-token' })
+  currentHashedRefreshToken: string;
 }
