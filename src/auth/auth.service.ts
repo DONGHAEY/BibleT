@@ -7,13 +7,10 @@ import {
 } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
 import { UserService } from './user.service';
-import * as bcrypt from 'bcrypt';
 import { Payload } from './types/payload.interface';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/domain/user.entity';
 import { RegisterUserDto } from './dto/registerUser.dto';
-import { MailService } from 'src/mail/mail.service';
-import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +36,7 @@ export class AuthService {
           email: userInfo.email,
         },
         {
-          secret: 'SECRET_KEY2',
+          secret: process.env.RESET_PASSWORD_TOKEN_SECRET_KEY,
           expiresIn: '300s',
         },
       ),
@@ -50,7 +47,7 @@ export class AuthService {
   async resetPassword(token: string, resetetPassword: string) {
     try {
       const decoded = this.jwtService.verify(token, {
-        secret: 'SECRET_KEY2',
+        secret: process.env.RESET_PASSWORD_TOKEN_SECRET_KEY,
       });
       await this.userService.removeRefreshToken(decoded.id);
       return await this.modifyPassword(decoded.username, resetetPassword);
@@ -125,7 +122,7 @@ export class AuthService {
       authorities: user.authorities,
     };
     return this.jwtService.sign(payload, {
-      secret: 'ACCESSTOKEN_SECRET_KEY',
+      secret: process.env.ACCESSTOKEN_SECRET_KEY,
       expiresIn: '1h',
     });
   }
@@ -138,7 +135,7 @@ export class AuthService {
       authorities: user.authorities,
     };
     return this.jwtService.sign(payload, {
-      secret: 'REFERESHTOKEN_SECRET_KEY',
+      secret: process.env.REFERESHTOKEN_SECRET_KEY,
       expiresIn: '60d',
     });
   }

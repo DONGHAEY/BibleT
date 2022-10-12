@@ -11,18 +11,23 @@ import { TrainProfile } from './domain/train-profile.entity';
 import { Bible } from './domain/bible.entity';
 import { TrackModule } from './track/track.module';
 import { BibleTrack } from './domain/bible-track.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CheckStamp } from './domain/check-stamp.entity';
 import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `./env/${process.env.NODE_ENV}.env`,
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: '127.0.0.1',
+      host: process.env.DB_HOST,
       port: 3306,
-      username: 'root',
-      password: '9310',
-      database: 'bibleTrainTest',
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       synchronize: false,
       entities: [
         UserAuthority,
@@ -44,15 +49,4 @@ import { MailModule } from './mail/mail.module';
   controllers: [AppController],
   providers: [AppService],
 })
-
-// @Module({
-//   imports: [
-//     TypeOrmModule.forRootAsync({useFactory : ormConfig}),
-//     CatsModule,
-//     AuthModule,
-//     BibleTrainModule
-//   ],
-//   controllers: [AppController],
-//   providers: [AppService],
-// })
 export class AppModule {}

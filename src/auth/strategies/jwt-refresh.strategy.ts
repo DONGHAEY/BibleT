@@ -17,7 +17,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
         (request: Request) => request.cookies.Refresh,
       ]),
       ignoreExpiration: false, //만료기한을 무시할것인가
-      secretOrKey: 'REFERESHTOKEN_SECRET_KEY',
+      secretOrKey: process.env.REFERESHTOKEN_SECRET_KEY,
       passReqToCallback: true,
     });
   }

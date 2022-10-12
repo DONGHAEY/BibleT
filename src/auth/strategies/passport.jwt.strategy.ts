@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         (request: Request) => request.cookies.accessToken,
       ]),
       ignoreExpiration: false, //만료기한을 무시할것인가
-      secretOrKey: 'ACCESSTOKEN_SECRET_KEY',
+      secretOrKey: process.env.ACCESSTOKEN_SECRET_KEY,
     });
   }
 
